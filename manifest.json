@@ -1,38 +1,46 @@
 {
-	"name": "Extensions Reloader",
-	"manifest_version": 2,
-	"version": "1.12",
-	"icons": {
-		"16": "icon16.png",
-		"48": "icon48.png",
-		"128": "icon128.png"
-	},
-	"background": {
-		"page": "background.html"
-	},
-	"commands": {
-      "reload": {
-         "description": "Reload all extensions in development.",
-         "suggested_key": {
-            "default": "Alt+R"
-         }
+  "name": "Extensions Reloader (Fork)",
+  "manifest_version": 2,
+  "version": "2.0",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "scripts": [
+      "third_party/scripts/jquery.extend.js",
+      "forks/urijs/src/URI.js",
+      "scripts/classes/main/URL.js",
+      "scripts/classes/main/Settings.js",
+      "scripts/classes/main/Debug.js",
+      "scripts/classes/main/Chrome.js",
+      "scripts/pages/background.js"
+    ]
+  },
+  "commands": {
+    "reload": {
+      "description": "Reload all extensions in development.",
+      "suggested_key": {
+        "default": "Alt+R"
       }
-   },
-   "options_ui": {
-    "page": "options.html",
+    }
+  },
+  "options_ui": {
+    "page": "pages/options.html",
     "chrome_style": true
   },
-	"permissions": [
-		"tabs",
-		"management",
-		"storage",
-		"webRequest",
-		"webRequestBlocking",
-		"http://reload.extensions/"
-	],
-	"browser_action": {
-		"default_icon": "icon19.png",
-		"default_title": "Reload Extensions"
-	},
-	"description": "Reload all unpacked extensions using the extension's toolbar button or by browsing to \"http://reload.extensions\""
+  "permissions": [
+    "tabs",
+    "management",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "http://reload.extensions/*"
+  ],
+  "browser_action": {
+    "default_icon": "images/icon19.png",
+    "default_title": "Reload Extensions"
+  },
+  "description": "Reload all unpacked extensions using the extension's toolbar button or by browsing to \"http://reload.extensions\""
 }

@@ -1,8 +1,13 @@
 (function () {
 
-    var aviJS = this.aviJS = this.aviJS || {};
-    (function () {
-        this.IsActive = () => true;
-    }).bind(aviJS.Debug = aviJS.Debug || {})();
+    var aviJS = this.aviJS = this.aviJS || {},
+        RootNS = aviJS,
+        ThisNS = RootNS.Debug = RootNS.Debug || {};
     
+    ThisNS.IsActive = () => false;
+    
+    
+    aviJS.Debug     = ThisNS;
+
+
 }.bind(this)());

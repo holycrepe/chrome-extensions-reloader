@@ -1,0 +1,32 @@
+///<reference path="../../../typings/browser/ambient/urijs/index.d.ts"/>
+type UriQueryParameters = {[key:string]:(number|string)};
+
+declare namespace uriFork {
+    interface URI extends uri.URI {
+        params:UriQueryParameters;
+        parseParams(addressOrUri:string|uri.URIOptions | uri.URI):UriQueryParameters;
+        page:number;
+        getPage():number;
+        setPage(value:number, build?:boolean):URI;
+        movePage(value?:number, build?:boolean):URI;
+        navigate():void;
+    }
+    interface URIFork extends URI {
+        
+    }
+}
+
+
+declare var URI: uri.URIStatic;
+
+declare module 'URI' {
+    export = URI;
+}
+
+declare module 'urijs' {
+    export = URI;
+}
+
+declare module 'urijs/src/URITemplate' {
+    export = URI;
+}

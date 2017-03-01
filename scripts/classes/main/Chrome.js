@@ -1,9 +1,10 @@
 (function () {
 
     //noinspection LocalVariableNamingConventionJS
-    var RootNS = this.aviJS = this.aviJS || {};
+    var aviJS = this.aviJS = this.aviJS || {},
+        RootNS = aviJS,
+        ThisNS = RootNS.Chrome = RootNS.Chrome || {};
 
-    (function () {
         var settings        = {
             reloadExtensionTabs: () => true,
             reloadActiveExtensionTabsOnly: () => true
@@ -15,13 +16,13 @@
         /** @param tab {chrome.tabs.Tab} */
         var debugTab = (tab) => console.log(tab);
 
-        this.MessageAllTabs = function (message, ignoredIds) {
+        ThisNS.MessageAllTabs = function (message, ignoredIds) {
             if (typeof message === "string") {
                 message = {
                     action: message
                 };
             }
-            this.forAllTabs(
+            ThisNS.forAllTabs(
                 /** @param tab {chrome.tabs.Tab} */
                 function (tab) {
                     chrome.tabs.sendMessage(tab.id, message);
@@ -35,7 +36,7 @@
 
         };
 
-        this.ReloadExtensionTabs = function (options) {
+        ThisNS.ReloadExtensionTabs = function (options) {
             options = options || {};
             if (!settings.reloadExtensionTabs())
                 return;
@@ -45,7 +46,7 @@
                     active:      true
                 });
 
-            this.forExtensionTabs(
+            ThisNS.forExtensionTabs(
                 reloadTab,
                 function (tabTitles) {
                     if (RootNS.Debug.IsActive('Events.ReloadExtension.ReloadExtensionTabs')) {
@@ -53,14 +54,14 @@
                     }
                 }, options);
         };
-        this.Command             = function (baseRequest, cmdType, mainCallback) {
+        ThisNS.Command             = function (baseRequest, cmdType, mainCallback) {
             var self     = this;
             self.cmdType = cmdType;
-            this.create  = (options, callback) =>
-                this.send("create_" + this.cmdType, options, callback);
-            this.delete  = (options, callback) =>
-                this.send("delete_" + this.cmdType, options, callback);
-            this.send    = function (cmdType, options, callback) {
+            ThisNS.create  = (options, callback) =>
+                ThisNS.send("create_" + ThisNS.cmdType, options, callback);
+            ThisNS.delete  = (options, callback) =>
+                ThisNS.send("delete_" + ThisNS.cmdType, options, callback);
+            ThisNS.send    = function (cmdType, options, callback) {
                 if (typeof cmdType === "string")
                     cmdType = {"cmd": cmdType};
                 var request = $.extend({}, baseRequest, cmdType, options || {});
@@ -73,8 +74,8 @@
             };
         };
 
-        this.ContextMenuCommand = (contextMenuType, title, baseRequest, mainCallback) =>
-            new this.Command(
+        ThisNS.ContextMenuCommand = (contextMenuType, title, baseRequest, mainCallback) =>
+            new ThisNS.Command(
                 $.extend({
                     context_menu_type: contextMenuType,
                     title:             title
@@ -85,7 +86,7 @@
          *
          * @returns {Array<string>}
          */
-        this.getContentScriptUrls = function () {
+        ThisNS.getContentScriptUrls = function () {
             var urls           = [];
             var manifest       = chrome.runtime.getManifest();
             var contentScripts = manifest["content_scripts"];
@@ -102,8 +103,8 @@
          *
          * @returns {Array<RegExp>}
          */
-        this.getContentScriptUrlPatterns = function () {
-            var urls     = this.getContentScriptUrls(),
+        ThisNS.getContentScriptUrlPatterns = function () {
+            var urls     = ThisNS.getContentScriptUrls(),
                 patterns = [];
             for (var i = 0, length = urls.length; i < length; i++) {
                 patterns.push(RegExp.fromGlob(urls[i]));
@@ -112,11 +113,11 @@
         };
 
 
-        this.forExtensionTabs = function (callback, onCompleteCallback, options) {
-            var urls      = this.getContentScriptUrlPatterns();
+        ThisNS.forExtensionTabs = function (callback, onCompleteCallback, options) {
+            var urls      = ThisNS.getContentScriptUrlPatterns();
             var urlLength = urls.length;
 
-            this.forAllTabs(
+            ThisNS.forAllTabs(
                 /** @param tab {chrome.tabs.Tab} */
                 function (tab) {
                     if (tab.url.startsWith("chrome://"))
@@ -135,7 +136,7 @@
                 onCompleteCallback, options);
         };
 
-        this.forAllTabs = function (callback, onCompleteCallback, options) {
+        ThisNS.forAllTabs = function (callback, onCompleteCallback, options) {
             if (Array.isArray(options)) {
                 options = {
                     ignoredIds: options
@@ -176,7 +177,7 @@
         };
 
 
-        this.GetUnpackedExtensions =
+        ThisNS.GetUnpackedExtensions =
             /**
              *
              * @param callback {Function<chrome.management.ExtensionInfo[]>}
@@ -202,19 +203,19 @@
                 });
             };
 
-        this.ForUnpackedExtensions =
+        ThisNS.ForUnpackedExtensions =
             /**
              *
              * @param callback {Function<chrome.management.ExtensionInfo, number, number, number>}
              * @summary Calls callback with parameters (extension, current, total, remaining), where current is the 1-based index
              */
                 function (callback) {
-                this.GetUnpackedExtensions(function (unpackedExtensions) {
+                ThisNS.GetUnpackedExtensions(function (unpackedExtensions) {
                     var total = unpackedExtensions.length,
                         i, j;
                     for (i = 0, j = unpackedExtensions.length; i < j; i++)
                         callback(unpackedExtensions[i], i + 1, total, total - i - 1);
                 });
             };
-    }).bind(RootNS.Chrome = RootNS.Chrome || {})();
+    aviJS.Chrome = ThisNS;
 }.bind(this)());

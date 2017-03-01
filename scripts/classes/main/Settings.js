@@ -1,14 +1,23 @@
-(function () {
+(function ($) {
 
     //noinspection LocalVariableNamingConventionJS
-    var RootNS = this.aviJS = this.aviJS || {};
+    var aviJS = this.aviJS = this.aviJS || {},
+        RootNS = aviJS,
+        ThisNS = RootNS.Settings = RootNS.Settings || {};
 
-    (function () {
-        var defaults = this.Defaults = {
+    var defaults = ThisNS.Defaults = {
             reloadPage:            false,
             persistExtensionPages: true
         },
-            names = this.Names = Object.keys(this.Defaults),
-            count = this.Count = this.Names.length;
-    }).bind(RootNS.Settings = RootNS.Settings || {})();
-}.bind(this)());
+        names = ThisNS.Names = Object.keys(defaults);
+    ThisNS.Load    = (callback) => {
+        chrome.storage.sync.get(function(items) {
+            $.extend(true, ThisNS, items);
+            callback(items);
+        })
+    };
+    ThisNS.Count   = names.length;
+    $.extend(true, ThisNS, defaults);
+    aviJS.Settings = ThisNS;
+
+}.bind(this)(jQuery));

@@ -1,31 +1,15 @@
 (function ($) {
-    var aviJS = this.aviJS = this.aviJS || {};
-    aviJS.URL = aviJS.URL || {};
+    var aviJS = this.aviJS = this.aviJS || {},
+        RootNS = aviJS,
+        ThisNS = RootNS.URL = RootNS.URL || {};
+
+    /************* START CURRENT NAMESPACE CODE *****************/
+    //noinspection LocalVariableNamingConventionJS
+    var Uri = ThisNS.Current = ThisNS.Current || new URI();
+    ThisNS.Params = (href) => (href ? new URI(href) : new URI()).params;
+    ThisNS.GET = (new URI()).params;
+    /*************  END  CURRENT NAMESPACE CODE *****************/
     
-    (function () {
-        //noinspection LocalVariableNamingConventionJS
-        var Uri = this.Uri = this.Uri || new URI();
-
-        // aviJS.URL.URLs = function(href) {
-        //     var self = this;
-        //     self.href = self.original = href;
-        // };
-
-        this.Params = function (href) {
-            var uri   = !href ? Uri.clone() : new URI(href);
-            var items = URI.parseQuery(uri.query());
-            for (var key in items) {
-                if (items.hasOwnProperty(key)) {
-                    var value = items[key];
-                    if ($.isNumeric(value) && !value.includes("."))
-                        items[key] = value = Number(value);
-                }
-            }
-            return items;
-        };
-
-        this.GET = this.Params();
-        
-    }).bind(aviJS.URL)()
-
+    
+    aviJS.URL = ThisNS;
 }.bind(this)(jQuery));
