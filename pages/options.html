@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reload Options</title>
+  <style>
+    body {
+        padding: 10px;
+        min-width: 500px;
+    }
+    code {
+        background-color: #e0e0e0;
+    }
+    #save,
+    #status { margin-top: 10px; }
+    #status { color: #228619 ;}
+      label {
+          font-weight: bold;
+      }
+  </style>
+</head>
+
+<body>
+
+ <label>
+    <input type="checkbox" id="reloadPage"> Reload current tab after extensions have been reloaded.
+  </label> <BR>
+
+
+  <label>
+    <input type="checkbox" id="persistExtensionPages"> Persist extension pages
+  </label>
+ <div style="margin-left: 20px;">&bullet; If an extension's page (e.g. <code>http://chrome-extension//<em>extension-id</em>/...</code>) is open, <BR>
+     re-open it once the extension is reloaded, since reloading an extension automatically closes any open extension pages.</div>
+ <BR>
+
+  <button id="save">Save</button>
+  <div id="status"></div>
+
+    <script src="../scripts/classes/main/Settings.js"></script>
+    <script src="../scripts/pages/options.js"></script>
+</body>
+</html>
