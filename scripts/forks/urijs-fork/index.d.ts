@@ -8,7 +8,9 @@
 
 declare namespace uriFork {
 
-    type UriQueryParameters = {[name: string]: number | string };
+    interface UriQueryParameters {
+        [name: string]: number | string
+    }
     
     interface URI {
         params:UriQueryParameters;
