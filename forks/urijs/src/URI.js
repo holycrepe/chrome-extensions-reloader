@@ -1105,45 +1105,121 @@
   p.navigate               = function() {
     window.location = this.valueOf();
   };
-  var defineParamsProperty = (function(key,fallback) {
-    var capitalizedKey = capitalizeFirstLetter(key),
-        getterKey='get' + capitalizedKey,
-        setterKey='set' + capitalizedKey;
-    var getter = p[getterKey] = function (v, deferBuild) {
-      var t        = this.getParams(v, deferBuild);
-      if (!t.hasOwnProperty(key))
-        return fallback;
-      var value = Number(t[key]);
-      return Number.isNaN(value) || !Number.isInteger(value) ? fallback : value;
-    };
-    var setter = p[setterKey] = function (v, deferBuild) {
-      this.setQuery(key, v, deferBuild === true);
-      return this;
-    };
-    var mover = p['move' + capitalizedKey] = function(v, deferBuild) {
-      return this.setPage(this.page + (v || 1), deferBuild);
-    };
-    Object.defineProperty(p, key, {
-      get:          p[getterKey],
-      set:          p[setterKey],
-      configurable: false,
-      enumerable:   true
-    });
-  });
+    const defineAutoProperty = (function(key,accessors,options) {
+              const capitalizedKey     = capitalizeFirstLetter(key),
+                    propertyDefinition = {
+                        configurable: false,
+                        enumerable:   true
+                    };
+              let hasPropertyAccessor  = false;
+              for (let accessorType in accessors) {
+                  /**
+                   * @type {{method: Function, prefix: string, key: string, name: string, explicit: boolean}}
+                    */
+                let accessor = accessors[accessorType];
+                  if (!accessor.hasOwnProperty("method")) {
+                    accessor = {
+                        method: accessor
+                    };
+                  }
+
+                  if (!accessor.prefix)
+                      accessor.prefix = accessorType;
+                  if (!accessor.name)
+                      accessor.name = capitalizedKey;
+                  accessor.key = accessor.prefix + accessor.name;
+                  if (accessor.explicit !== false)
+                      p[accessor.key]     = accessor.method;
+                  if (accessorType === "get" || accessorType === "set") {
+                      propertyDefinition[accessorType] = accessor.method;
+                      hasPropertyAccessor              = true;
+                  }
+              }
+              if (hasPropertyAccessor) {
+                  Object.defineProperty(p, key, propertyDefinition);
+              }
+          }),
+          defineParamsProperty = (function(key,fallbackOrOptions) {
+              const options   = typeof fallbackOrOptions === "object"
+                        ? fallbackOrOptions
+                        : {
+                            fallback: fallbackOrOptions,
+                            moveable: true
+                        },
+                    fallback  = options.fallback;
+              const accessors = {
+                  get:  function (v, deferBuild) {
+                      var t = this.getParams(v, deferBuild);
+                      if (!t.hasOwnProperty(key))
+                          return fallback;
+                      var value = Number(t[key]);
+                      return Number.isNaN(value) || !Number.isInteger(value)
+                          ? fallback
+                          : value;
+                  },
+                  set:  function (v, deferBuild) {
+                      this.setQuery(key, v, deferBuild === true);
+                      return this;
+                  },
+                  move: function (v, deferBuild) {
+                      return this.setPage(this.page + (v || 1), deferBuild);
+                  }
+              };
+              defineAutoProperty(key, accessors);
+          }),
+
+          defineStateProperty = (function(key) {
+
+              const accessors = {
+                  get: {
+                      explicit: false,
+                      method: function (v, deferBuild) {
+                          /** @type URI **/
+                          const self   = this;
+                          const result = this.is(key);
+                          return result;
+                      }
+                  }
+              };
+              defineAutoProperty("is" + capitalizeFirstLetter(key), accessors);
+          }),
+
+          defineProperty = (function(key) {
+              var capitalizedKey = capitalizeFirstLetter(key),
+                  getterKey='get' + capitalizedKey,
+                  setterKey='set' + capitalizedKey;
+              Object.defineProperty(p, key, {
+                  get:          p[getterKey],
+                  set:          p[setterKey],
+                  configurable: false,
+                  enumerable:   true
+              });
+          }),
+
+          stateProperties = [
+                'relative',
+                'absolute',
+                'domain',
+                'name',
+                'sld',
+                'IP',
+                'IP4',
+                'IPv4',
+                'inet4',
+                'IP6',
+                'IPv6',
+                'inet6',
+                'idn',
+                'url',
+                'urn',
+                'PunyCode'
+            ];
+
+
   defineParamsProperty("page", 1);
-  var defineProperty = (function(key) {
-    var capitalizedKey = capitalizeFirstLetter(key),
-        getterKey='get' + capitalizedKey,
-        setterKey='set' + capitalizedKey;
-    Object.defineProperty(p, key, {
-      get:          p[getterKey],
-      set:          p[setterKey],
-      configurable: false,
-      enumerable:   true
-    });
-  });
   defineProperty("params");
   defineProperty("site");
+  
   p.pathname = function(v, build) {
     if (v === undefined || v === true) {
       var res = this._parts.path || (this._parts.hostname ? '/' : '');
@@ -2266,6 +2342,10 @@
     this._parts.escapeQuerySpace = !!v;
     return this;
   };
+
+    for (let stateProperty of stateProperties) {
+        defineStateProperty(stateProperty);
+    }
 
   return URI;
 }));

@@ -8,6 +8,18 @@
 
 declare namespace uriFork {
 
+    type UriStateIdentifier = 'relative'
+        | 'absolute'
+        | 'domain' | 'name'
+        | 'sld'
+        | 'ip'
+        | 'ip4' | 'ipv4' | 'inet4'
+        | 'ip6' | 'ipv6' | 'inet6'
+        | 'idn'
+        | 'url'
+        | 'urn'
+        | 'punycode';
+
     interface UriQueryParameters {
         [name: string]: number | string
     }
@@ -16,6 +28,23 @@ declare namespace uriFork {
         params:UriQueryParameters;
         page:number;
         site: string;
+        readonly isRelative:boolean;
+        readonly isAbsolute:boolean;
+        readonly isDomain:boolean;
+        readonly isName:boolean;
+        readonly isSld:boolean;
+        readonly isIP:boolean;
+        readonly isIP4:boolean;
+        readonly isIPv4:boolean;
+        readonly isInet4:boolean;
+        readonly isIP6:boolean;
+        readonly isIPv6:boolean;
+        readonly isInet6:boolean;
+        readonly isIdn:boolean;
+        readonly isUrl:boolean;
+        readonly isUrn:boolean;
+        readonly isPunyCode:boolean;
+
         getPage():number;
         setPage(value:number, build?:boolean):URI;
         movePage(value?:number, build?:boolean):URI;
@@ -34,6 +63,7 @@ declare namespace uriFork {
         authority(): string;
         authority(authority: string): URI;
 
+        build(deferBuild?:boolean):URI;
         clone(): URI;
 
         directory(): string;
@@ -64,7 +94,7 @@ declare namespace uriFork {
         href(): string;
         href(url: string): void;
 
-        is(qry: string): boolean;
+        is(qry: UriStateIdentifier): boolean;
         iso8859(): URI;
 
         normalize(): URI;
